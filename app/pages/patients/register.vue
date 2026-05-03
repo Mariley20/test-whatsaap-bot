@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DOCUMENT_TYPES } from '#shared/constants/documentTypes'
+import { storeToRefs } from 'pinia'
 import { validateRegistration } from '#shared/utils/validation'
 import type { UserRegistrationData } from '#shared/types/userTypes'
 
@@ -6,7 +8,9 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const { isSecretary, registerPatient } = useAuth()
+const authStore = useAuthStore()
+const { isSecretary } = storeToRefs(authStore)
+const { registerPatient } = useAuth()
 
 const form = reactive<UserRegistrationData>({
   fullName: '',
@@ -23,12 +27,7 @@ const generalError = ref('')
 const successMessage = ref('')
 const loading = ref(false)
 
-const documentTypes = [
-  { value: 'CC', label: 'Cédula de Ciudadanía' },
-  { value: 'CE', label: 'Cédula de Extranjería' },
-  { value: 'TI', label: 'Tarjeta de Identidad' },
-  { value: 'PP', label: 'Pasaporte' },
-]
+const documentTypes = DOCUMENT_TYPES
 
 function resetForm() {
   form.fullName = ''

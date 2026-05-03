@@ -1,4 +1,6 @@
 import type {
+  USER_ROLE_GUEST,
+  USER_ROLE_SUPPORT,
   USER_ROLE_ADMIN,
   USER_ROLE_DOCTOR,
   USER_ROLE_PATIENT,
@@ -6,6 +8,8 @@ import type {
 } from '#shared/constants/userRoles'
 
 export type UserRole =
+  | typeof USER_ROLE_GUEST
+  | typeof USER_ROLE_SUPPORT
   | typeof USER_ROLE_ADMIN
   | typeof USER_ROLE_DOCTOR
   | typeof USER_ROLE_PATIENT
@@ -20,7 +24,7 @@ export interface IUser {
   documentType: string;
   phoneNumber: string;
   photoURL: string;
-  role: UserRole | '';
+  role: UserRole;
   acceptedTermsAndConditions: boolean;
   createdAt: Date | null
   updatedAt: Date | null

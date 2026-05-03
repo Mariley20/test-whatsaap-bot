@@ -1,5 +1,9 @@
 <script setup lang="ts">
-const { userData, isSecretary, logout } = useAuth()
+import { storeToRefs } from 'pinia'
+
+const authStore = useAuthStore()
+const { user: userData, isSecretary } = storeToRefs(authStore)
+const { logout } = useAuth()
 
 const loading = ref(false)
 
@@ -7,6 +11,7 @@ async function handleLogout() {
   loading.value = true
   try {
     await logout()
+    window.location.reload()
   } finally {
     loading.value = false
   }

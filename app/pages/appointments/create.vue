@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import type { CreateAppointmentData } from '#shared/utils/validation'
 
 definePageMeta({
   middleware: 'auth',
 })
 
-const { isSecretary } = useAuth()
+const authStore = useAuthStore()
+const { isSecretary } = storeToRefs(authStore)
 const { createAppointment } = useAppointments()
 
 const loading = ref(false)

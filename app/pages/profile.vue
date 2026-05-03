@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { DOCUMENT_TYPES } from '#shared/constants/documentTypes'
+import { storeToRefs } from 'pinia'
 import { validateProfile } from '#shared/utils/validation'
 
 definePageMeta({
   middleware: 'auth',
 })
 
-const { user, userData } = useAuth()
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 const { updateUser } = useUsers()
 
 const form = reactive({
@@ -22,14 +25,9 @@ const successMessage = ref('')
 const loading = ref(false)
 const initialized = ref(false)
 
-const documentTypes = [
-  { value: 'CC', label: 'Cédula de Ciudadanía' },
-  { value: 'CE', label: 'Cédula de Extranjería' },
-  { value: 'TI', label: 'Tarjeta de Identidad' },
-  { value: 'PP', label: 'Pasaporte' },
-]
+const documentTypes = DOCUMENT_TYPES
 
-watch(userData, (data) => {
+watch(user, (data) => {
   if (data && !initialized.value) {
     form.fullName = data.fullName || ''
     form.email = data.email || ''
@@ -85,7 +83,7 @@ async function handleSubmit() {
       {{ generalError }}
     </div>
 
-    <div v-if="!userData" class="text-sm text-gray-500">Cargando datos del perfil...</div>
+    <div v-if="!user" class="text-sm text-gray-500">Cargando datos del perfil...</div>
 
     <form v-else class="space-y-4" @submit.prevent="handleSubmit">
       <div>

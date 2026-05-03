@@ -1,8 +1,8 @@
-import { ref, computed, watchEffect, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import {
   collection,
   doc,
-  updateDoc,
+  setDoc,
   serverTimestamp,
   where,
   query,
@@ -31,13 +31,14 @@ export function useUsers() {
 
   /**
    * Updates a user document in Firestore with the provided partial data.
+   * If the document doesn't exist, it will be created.
    */
   async function updateUser(uid: string, data: Partial<IUser>): Promise<void> {
     const userRef = doc(db, 'users', uid)
-    await updateDoc(userRef, {
+    await setDoc(userRef, {
       ...data,
       updatedAt: serverTimestamp(),
-    })
+    }, { merge: true })
   }
 
   /**

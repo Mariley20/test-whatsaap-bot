@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+
 definePageMeta({
   middleware: 'auth',
 })
 
-const { userData, isSecretary, isDoctor, isPatient } = useAuth()
+const authStore = useAuthStore()
+const { user: userData, isSecretary, isDoctor, isPatient } = storeToRefs(authStore)
 </script>
 
 <template>
