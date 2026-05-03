@@ -62,10 +62,11 @@ Kiro actúa como un desarrollador frontend senior especializado en:
 Cuando Kiro genere código frontend:
 
 1. **Componentes**: `<script setup lang="ts">` + template con Tailwind + Headless UI si aplica
-2. **Composables**: funciones puras que encapsulan lógica de Firebase/APIs
-3. **Stores**: setup stores de Pinia que orquestan composables
-4. **Páginas**: usar `definePageMeta`, layouts, y middleware de Nuxt
-5. **Tipos**: interfaces en `shared/types/`, importadas con `#shared/`
+2. **Composables**: funciones puras que encapsulan lógica de Firebase/APIs (`front/app/composables/`)
+3. **Stores**: setup stores de Pinia que orquestan composables (`front/app/stores/`)
+4. **Páginas**: usar `definePageMeta`, layouts, y middleware de Nuxt (`front/app/pages/`)
+5. **Tipos**: interfaces en `front/shared/types/`, importadas con `#shared/`
+6. **Constantes**: roles en `front/shared/constants/userRoles.ts`, tipos de documento en `front/shared/constants/documentTypes.ts`
 
 ## Ejemplo de Componente Completo
 

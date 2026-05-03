@@ -12,7 +12,7 @@ Store (authStore, appointmentStore...)
 Componentes (UI)
 ```
 
-## Composables (`app/composables/`)
+## Composables (`front/app/composables/`)
 
 Los composables encapsulan la **lógica de integración con Firebase** u otros servicios. No guardan estado global.
 
@@ -25,27 +25,20 @@ Los composables encapsulan la **lógica de integración con Firebase** u otros s
 
 ### Convenciones
 
-- Nombre con prefijo `use`: `useAuth`, `useFirestore`, `useAppointments`
-- Ubicación: `app/composables/`
+- Nombre con prefijo `use`: `useAuth`, `useFirestore`, `useAppointments`, `useUsers`
+- Ubicación: `front/app/composables/`
 - Auto-importados por Nuxt (no necesitan import explícito)
 - Pueden recibir parámetros (refs, IDs, etc.)
-- NO deben acceder directamente al store — el componente o la página es quien conecta composable ↔ store
+- `useAuth` es la excepción: accede a `authStore.setUser()` para sincronizar estado tras operaciones de Firebase Auth
 
-### Ejemplo de estructura (useAuth)
+### Composables actuales
 
-```ts
-// app/composables/useAuth.ts
-export function useAuth() {
-  // Integración directa con Firebase Auth
-  async function login(email: string, password: string) { /* ... */ }
-  async function logout() { /* ... */ }
-  function onAuthChange(callback: (user: User | null) => void) { /* ... */ }
+- `useFirebase.ts` — Instancias de Firebase Auth y Firestore, `useCurrentUser()`, `getCurrentUser()`
+- `useAuth.ts` — Login, logout, registerPatient, waitForAuthState, mapFirebaseUser
+- `useUsers.ts` — CRUD de usuarios en Firestore (getUserById, updateUser, getDoctors, getPatients)
+- `useAppointments.ts` — CRUD de citas, slots disponibles
 
-  return { login, logout, onAuthChange }
-}
-```
-
-## Stores (`app/stores/`)
+## Stores (`front/app/stores/`)
 
 Los stores (Pinia) guardan el **estado global reactivo** de la aplicación. No llaman a Firebase directamente.
 
@@ -59,43 +52,27 @@ Los stores (Pinia) guardan el **estado global reactivo** de la aplicación. No l
 ### Convenciones
 
 - Nombre con sufijo `Store`: `useAuthStore`, `useAppointmentStore`
-- Ubicación: `app/stores/`
+- Ubicación: `front/app/stores/`
 - Usar `defineStore` de Pinia con setup syntax (composition API)
-- Los actions del store pueden llamar a composables para ejecutar operaciones y luego actualizar el estado
-- Los componentes leen estado del store, no del composable
+- Los actions del store llaman a composables para ejecutar operaciones y luego actualizan el estado
+- Los componentes leen estado del store con `storeToRefs()`, no del composable
 
-### Ejemplo de estructura (authStore)
+### Store actual (authStore)
 
-```ts
-// app/stores/auth.ts
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<IUser | null>(null)
-  const loading = ref(true)
-  const isAuthenticated = computed(() => !!user.value)
+- State: `user` (IUser | null), `loading` (boolean)
+- Getters: `isAuthenticated`, `isSecretary`, `isDoctor`, `isPatient`
+- Actions: `setUser(data)`, `fetchUser()` (usado en middlewares)
 
-  // Actions que orquestan composable + estado
-  async function login(email: string, password: string) {
-    const { login: firebaseLogin } = useAuth()
-    await firebaseLogin(email, password)
-    // actualizar estado...
-  }
+## Flujo de Autenticación
 
-  return { user, loading, isAuthenticated, login }
-})
-```
-
-## Flujo Completo
-
-1. **Componente** llama a un action del **store** (ej: `authStore.login(email, password)`)
-2. **Store** usa el **composable** para ejecutar la operación en Firebase
-3. **Composable** ejecuta la llamada a Firebase y retorna el resultado
-4. **Store** actualiza su estado reactivo con el resultado
-5. **Componente** reacciona al cambio de estado del store (reactividad de Vue)
+1. **Login**: Componente llama `useAuth().login()` → Firebase Auth → Firestore doc → `authStore.setUser()`
+2. **Middleware**: `authStore.fetchUser()` → `useAuth().waitForAuthState()` → resuelve usuario → `setUser()`
+3. **Logout**: Componente llama `useAuth().logout()` → Firebase signOut → `authStore.setUser(null)` → `navigateTo('/login')`
+4. Si no existe documento en Firestore, se construye IUser básico desde Firebase Auth (`mapFirebaseUser`)
 
 ## Qué NO hacer
 
 - ❌ Guardar estado global en un composable (usar store)
 - ❌ Llamar a Firebase directamente desde un componente o página
 - ❌ Llamar a Firebase directamente desde un store (usar composable)
-- ❌ Que un composable importe y modifique un store
 - ❌ Duplicar estado entre composable y store

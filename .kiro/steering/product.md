@@ -1,15 +1,18 @@
 # Product Overview
 
-**Maley** is a medical appointment scheduling web application built with Nuxt 4 and Firebase. It allows secretaries to register patients and schedule appointments with doctors, while doctors and patients can view their respective appointments.
+**Maley** is a medical appointment scheduling web application built with Nuxt 4 (frontend) and Firebase (backend: Auth, Firestore, Cloud Functions).
 
-## Current State
+## Architecture
 
-The project has core business logic implemented (validation, time slot generation, appointment serialization) and is progressing through UI and composable implementation.
+- **Frontend** (`front/`): Nuxt 4 SPA with Firebase JS SDK for Auth and Firestore
+- **Backend** (`functions/`): Firebase Cloud Functions for server-side logic
+- **Database**: Cloud Firestore
+- **Auth**: Firebase Authentication (email/password)
 
 ## Key Features
 
 - User authentication with Firebase Auth (email/password)
-- Role-based access: admin, doctor, patient, secretary
+- Role-based access: guest, support, admin, doctor, patient, secretary
 - Patient registration by secretary
 - Appointment scheduling with doctor availability based on working hours
 - Appointment viewing filtered by role
@@ -18,6 +21,8 @@ The project has core business logic implemented (validation, time slot generatio
 
 ## Roles
 
+- **Guest**: Authenticated user without assigned role
+- **Support**: Technical support
 - **Secretary**: Registers patients, schedules and cancels appointments, views all appointments
 - **Doctor**: Views assigned appointments, defines working hours
 - **Patient**: Views own appointments
